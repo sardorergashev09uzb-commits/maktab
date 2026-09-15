@@ -1,0 +1,38 @@
+# Yii2 local and runtime
+*-local.php
+/vendor
+/runtime
+*/runtime
+/scratch
+.vagrant
+
+# Node / Next.js
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+client/.env*.local
+.env*.local
+
+# IDE and OS
+.idea
+.vscode
+nbproject
+.buildpath
+.project
+.settings
+Thumbs.db
+.DS_Store
+
+# Temporary / tests
+phpunit.phar
+/phpunit.xml
+composer.phar
+
+# Generated
+/frontend/web/index.php
+/frontend/web/index-test.php
+/frontend/web/robots.txt
+/backend/web/index.php
+/backend/web/index-test.php
+/backend/web/robots.txt
