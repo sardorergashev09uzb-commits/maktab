@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const DEFAULT_API_URL = 'https://vbulletin-fun-italic-polls.trycloudflare.com/v1';
+export const DEFAULT_API_URL = 'https://sardorbek.alwaysdata.net/v1';
 const API_STORAGE_KEY = '@maktab_api_url';
 
 export async function getApiUrl(): Promise<string> {

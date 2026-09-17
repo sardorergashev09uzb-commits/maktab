@@ -13,16 +13,14 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../lib/auth-context';
-import { ApiSettingsModal } from '../components/ApiSettingsModal';
 import { colors } from '../lib/theme';
 
 export function LoginScreen() {
   const { login } = useAuth();
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showApiModal, setShowApiModal] = useState(false);
 
   const handleLogin = async () => {
     if (!username.trim() || !password.trim()) {
@@ -43,23 +41,12 @@ export function LoginScreen() {
     }
   };
 
-  const handleQuickFill = (u: string, p: string) => {
-    setUsername(u);
-    setPassword(p);
-  };
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        <View style={styles.topBar}>
-          <TouchableOpacity style={styles.apiBtn} onPress={() => setShowApiModal(true)}>
-            <Ionicons name="server-outline" size={18} color={colors.primary} />
-            <Text style={styles.apiBtnText}>Server</Text>
-          </TouchableOpacity>
-        </View>
 
         <View style={styles.header}>
           <View style={styles.logoCircle}>
@@ -120,24 +107,10 @@ export function LoginScreen() {
               <Text style={styles.loginBtnText}>Tizimga Kirish</Text>
             )}
           </TouchableOpacity>
-
-          <View style={styles.quickFillSection}>
-            <Text style={styles.quickFillTitle}>Tezkor sinov uchun:</Text>
-            <View style={styles.chipRow}>
-              <TouchableOpacity
-                style={styles.chip}
-                onPress={() => handleQuickFill('admin', 'admin123')}
-              >
-                <Text style={styles.chipText}>Admin</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
         </View>
 
         <Text style={styles.footerText}>© 2026 Al-Xorazmiy Maktab Platformasi</Text>
       </ScrollView>
-
-      <ApiSettingsModal visible={showApiModal} onClose={() => setShowApiModal(false)} />
     </KeyboardAvoidingView>
   );
 }
@@ -151,24 +124,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 24,
     justifyContent: 'center',
-  },
-  topBar: {
-    alignItems: 'flex-end',
-    marginBottom: 10,
-  },
-  apiBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  apiBtnText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.primary,
   },
   header: {
     alignItems: 'center',
@@ -264,36 +219,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '700',
-  },
-  quickFillSection: {
-    marginTop: 20,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-  },
-  quickFillTitle: {
-    fontSize: 12,
-    color: colors.textMuted,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    backgroundColor: colors.bg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  chipText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.text,
   },
   footerText: {
     textAlign: 'center',

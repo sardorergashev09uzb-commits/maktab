@@ -13,7 +13,7 @@ import {
   TeacherPortalData,
 } from '../types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://sardorbek.alwaysdata.net/v1';
 
 function getToken() {
   if (typeof window !== 'undefined') {
