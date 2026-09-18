@@ -31,9 +31,17 @@ class CmsController extends Controller
         ];
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::class,
-            'optional' => ['public'],
+            'optional' => ['public', 'seed-demo'],
         ];
         return $behaviors;
+    }
+
+    /**
+     * Populate full demo data into the database
+     */
+    public function actionSeedDemo()
+    {
+        return \common\services\DemoDataSeeder::run();
     }
 
     /**

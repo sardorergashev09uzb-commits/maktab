@@ -75,6 +75,7 @@ return [
                 'POST v1/admission/<id:\d+>/enroll' => 'v1/admission/enroll',
                 'GET v1/admission/stats' => 'v1/admission/stats',
                 'GET v1/cms/public' => 'v1/cms/public',
+                'GET,POST v1/cms/seed-demo' => 'v1/cms/seed-demo',
                 'GET v1/cms/sections' => 'v1/cms/sections',
                 'PUT v1/cms/sections/<id:\d+>' => 'v1/cms/update-section',
                 'GET v1/cms/faqs' => 'v1/cms/faqs',
