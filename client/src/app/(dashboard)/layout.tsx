@@ -67,69 +67,69 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    groupTitle: 'Boshqaruv & CRM',
+    groupTitle: 'Bosh Sahifa',
     items: [
       { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['super_admin', 'admin', 'director', 'zavuch', 'accountant'] },
-      { name: 'Katta Analitika (KPI)', href: '/analytics', icon: BarChart3, roles: ['super_admin', 'admin', 'director', 'zavuch', 'accountant'] },
-      { name: 'Qabul CRM (Admissions)', href: '/admissions', icon: UserPlus, roles: ['super_admin', 'admin', 'director'] },
-      { name: 'Sayt Boshqaruvi (CMS)', href: '/cms', icon: Globe, roles: ['super_admin', 'admin', 'director'] },
+      { name: 'Analitika', href: '/analytics', icon: BarChart3, roles: ['super_admin', 'admin', 'director'] },
+      { name: 'E\'lonlar', href: '/announcements', icon: Bell, roles: ['super_admin', 'admin', 'director', 'zavuch', 'teacher', 'student', 'parent'] },
     ],
   },
   {
-    groupTitle: 'Akademik Baza',
+    groupTitle: 'O\'quvchilar & O\'qituvchilar',
     items: [
-      { name: 'O\'quvchilar', href: '/students', icon: Users, roles: ['super_admin', 'admin', 'director', 'zavuch', 'accountant'] },
+      { name: 'O\'quvchilar', href: '/students', icon: Users, roles: ['super_admin', 'admin', 'director', 'zavuch'] },
       { name: 'O\'qituvchilar', href: '/teachers', icon: GraduationCap, roles: ['super_admin', 'admin', 'director', 'zavuch'] },
       { name: 'Sinflar', href: '/classes', icon: School, roles: ['super_admin', 'admin', 'director', 'zavuch'] },
       { name: 'Fanlar', href: '/subjects', icon: BookOpen, roles: ['super_admin', 'admin', 'director', 'zavuch'] },
-      { name: 'Xonalar', href: '/rooms', icon: DoorOpen, roles: ['super_admin', 'admin', 'director', 'zavuch'] },
-      { name: 'O\'quv yili', href: '/academic-years', icon: Calendar, roles: ['super_admin', 'admin', 'director', 'zavuch'] },
     ],
   },
   {
     groupTitle: 'Darslar & Nazorat',
     items: [
-      { name: 'Akademik taqvim', href: '/calendar', icon: CalendarDays, roles: ['super_admin', 'admin', 'director', 'zavuch', 'teacher'] },
       { name: 'Dars jadvali', href: '/schedule', icon: Clock, roles: ['super_admin', 'admin', 'director', 'zavuch', 'teacher', 'student'] },
       { name: 'Darslar', href: '/lessons', icon: BookOpen, roles: ['super_admin', 'admin', 'director', 'zavuch', 'teacher'] },
       { name: 'Davomat', href: '/attendance', icon: UserCheck, roles: ['super_admin', 'admin', 'director', 'zavuch', 'teacher'] },
-      { name: 'Baholar & Jurnal', href: '/grades', icon: Award, roles: ['super_admin', 'admin', 'director', 'zavuch', 'teacher'] },
-      { name: 'Zavuch ruxsatlari', href: '/overrides', icon: ShieldCheck, roles: ['super_admin', 'admin', 'zavuch', 'teacher'] },
+      { name: 'Baholar', href: '/grades', icon: Award, roles: ['super_admin', 'admin', 'director', 'zavuch', 'teacher'] },
     ],
   },
   {
     groupTitle: 'Topshiriq & Imtihon',
     items: [
       { name: 'Topshiriqlar', href: '/assignments', icon: FileText, roles: ['super_admin', 'admin', 'zavuch', 'teacher', 'student'] },
-      { name: 'Topshiriq tekshirish', href: '/submissions', icon: CheckSquare, roles: ['super_admin', 'admin', 'zavuch', 'teacher'] },
-      { name: 'Savollar banki', href: '/question-bank', icon: HelpCircle, roles: ['super_admin', 'admin', 'zavuch', 'teacher'] },
+      { name: 'Topshiriqlarni tekshirish', href: '/submissions', icon: CheckSquare, roles: ['super_admin', 'admin', 'zavuch', 'teacher'] },
       { name: 'Imtihonlar', href: '/exams', icon: Award, roles: ['super_admin', 'admin', 'zavuch', 'teacher'] },
       { name: 'Test topshirish', href: '/exam-taker', icon: PlayCircle, roles: ['student'] },
     ],
   },
   {
-    groupTitle: 'Moliya & Shartnomalar',
+    groupTitle: 'Moliya',
     items: [
       { name: 'Shartnomalar', href: '/contracts', icon: FileText, roles: ['super_admin', 'admin', 'director', 'accountant'] },
-      { name: 'Invoyslar & Qarz', href: '/invoices', icon: Receipt, roles: ['super_admin', 'admin', 'director', 'accountant'] },
+      { name: 'Invoyslar', href: '/invoices', icon: Receipt, roles: ['super_admin', 'admin', 'director', 'accountant'] },
       { name: 'To\'lovlar', href: '/payments', icon: CreditCard, roles: ['super_admin', 'admin', 'director', 'accountant'] },
     ],
   },
   {
-    groupTitle: 'Gamifikatsiya & Rag\'bat',
+    groupTitle: 'Rag\'bat & Gamifikatsiya',
     items: [
       { name: 'Coin Tizimi', href: '/coins', icon: Coins, roles: ['super_admin', 'admin', 'teacher', 'student'] },
-      { name: 'Do\'kon & Reyting', href: '/rewards', icon: Gift, roles: ['super_admin', 'admin', 'student'] },
-      { name: 'Yutuq & Sertifikat', href: '/achievements', icon: Award, roles: ['super_admin', 'admin', 'teacher', 'student'] },
+      { name: 'Yutuqlar', href: '/achievements', icon: Award, roles: ['super_admin', 'admin', 'teacher', 'student'] },
     ],
   },
   {
-    groupTitle: 'Tizim & Muloqot',
+    groupTitle: 'Qabul & Sayt',
     items: [
-      { name: 'E\'lonlar taxtasi', href: '/announcements', icon: Bell, roles: ['super_admin', 'admin', 'director', 'zavuch', 'teacher', 'student', 'parent'] },
-      { name: 'So\'rovnomalar', href: '/surveys', icon: ClipboardCheck, roles: ['super_admin', 'admin', 'director', 'zavuch', 'teacher', 'student', 'parent'] },
+      { name: 'Qabul (Admissions)', href: '/admissions', icon: UserPlus, roles: ['super_admin', 'admin', 'director'] },
+      { name: 'Sayt boshqaruvi', href: '/cms', icon: Globe, roles: ['super_admin', 'admin'] },
+    ],
+  },
+  {
+    groupTitle: 'Tizim',
+    items: [
+      { name: 'Xonalar', href: '/rooms', icon: DoorOpen, roles: ['super_admin', 'admin', 'director'] },
+      { name: 'O\'quv yili', href: '/academic-years', icon: Calendar, roles: ['super_admin', 'admin', 'director'] },
+      { name: 'Sozlamalar', href: '/settings', icon: Settings, roles: ['super_admin', 'admin'] },
       { name: 'Audit Jurnali', href: '/audit-logs', icon: ShieldAlert, roles: ['super_admin', 'admin'] },
-      { name: 'Tizim Sozlamalari', href: '/settings', icon: Settings, roles: ['super_admin', 'admin'] },
     ],
   },
 ];
