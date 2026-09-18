@@ -12,7 +12,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
 import { ProfileModal } from '../components/ProfileModal';
-import { ApiSettingsModal } from '../components/ApiSettingsModal';
 import { api } from '../lib/api';
 import { TeacherPortalData, Lesson } from '../types';
 import { colors } from '../lib/theme';
@@ -26,7 +25,6 @@ export function TeacherScreen() {
   const [attendanceRecords, setAttendanceRecords] = useState<{ [studentId: number]: number }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showApiModal, setShowApiModal] = useState(false);
 
   const loadData = async () => {
     try {
@@ -115,7 +113,6 @@ export function TeacherScreen() {
         title="Oʻqituvchi Stoli"
         subtitle={data?.teacher?.specialization || 'Pedagog'}
         onOpenProfile={() => setShowProfileModal(true)}
-        onOpenSettings={() => setShowApiModal(true)}
       />
 
       {/* Tabs */}
@@ -358,7 +355,6 @@ export function TeacherScreen() {
       </ScrollView>
 
       <ProfileModal visible={showProfileModal} onClose={() => setShowProfileModal(false)} />
-      <ApiSettingsModal visible={showApiModal} onClose={() => setShowApiModal(false)} />
     </View>
   );
 }

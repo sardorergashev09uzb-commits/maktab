@@ -8,10 +8,9 @@ interface HeaderProps {
   title: string;
   subtitle?: string;
   onOpenProfile: () => void;
-  onOpenSettings: () => void;
 }
 
-export function Header({ title, subtitle, onOpenProfile, onOpenSettings }: HeaderProps) {
+export function Header({ title, subtitle, onOpenProfile }: HeaderProps) {
   const { user, role } = useAuth();
 
   const getRoleLabel = () => {
@@ -38,10 +37,6 @@ export function Header({ title, subtitle, onOpenProfile, onOpenSettings }: Heade
       </View>
 
       <View style={styles.right}>
-        <TouchableOpacity style={styles.settingsBtn} onPress={onOpenSettings} activeOpacity={0.7}>
-          <Ionicons name="wifi-outline" size={20} color={colors.textMuted} />
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.profileBtn} onPress={onOpenProfile} activeOpacity={0.7}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
@@ -85,14 +80,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-  },
-  settingsBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.bg,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   profileBtn: {
     flexDirection: 'row',

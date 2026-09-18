@@ -11,7 +11,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
 import { ProfileModal } from '../components/ProfileModal';
-import { ApiSettingsModal } from '../components/ApiSettingsModal';
 import { api } from '../lib/api';
 import { StudentPortalData } from '../types';
 import { colors } from '../lib/theme';
@@ -23,7 +22,6 @@ export function StudentScreen() {
   const [activeTab, setActiveTab] = useState<'today' | 'schedule' | 'grades' | 'tasks' | 'coins'>('today');
   const [selectedDay, setSelectedDay] = useState(1);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showApiModal, setShowApiModal] = useState(false);
 
   const loadData = async () => {
     try {
@@ -72,7 +70,6 @@ export function StudentScreen() {
         title="Oʻquvchi Portali"
         subtitle={data?.student?.student_code ? `ID: ${data.student.student_code}` : undefined}
         onOpenProfile={() => setShowProfileModal(true)}
-        onOpenSettings={() => setShowApiModal(true)}
       />
 
       {/* Tabs */}
@@ -352,7 +349,6 @@ export function StudentScreen() {
       </ScrollView>
 
       <ProfileModal visible={showProfileModal} onClose={() => setShowProfileModal(false)} />
-      <ApiSettingsModal visible={showApiModal} onClose={() => setShowApiModal(false)} />
     </View>
   );
 }

@@ -11,7 +11,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
 import { ProfileModal } from '../components/ProfileModal';
-import { ApiSettingsModal } from '../components/ApiSettingsModal';
 import { api } from '../lib/api';
 import { ParentPortalData } from '../types';
 import { colors } from '../lib/theme';
@@ -23,7 +22,6 @@ export function ParentScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'grades' | 'finance' | 'announcements'>('overview');
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showApiModal, setShowApiModal] = useState(false);
 
   const loadData = async () => {
     try {
@@ -64,7 +62,6 @@ export function ParentScreen() {
         title="Ota-ona Portali"
         subtitle="Farzandlaringiz taʻlimi nazorati"
         onOpenProfile={() => setShowProfileModal(true)}
-        onOpenSettings={() => setShowApiModal(true)}
       />
 
       {/* Children Selector */}
@@ -289,7 +286,6 @@ export function ParentScreen() {
       </ScrollView>
 
       <ProfileModal visible={showProfileModal} onClose={() => setShowProfileModal(false)} />
-      <ApiSettingsModal visible={showApiModal} onClose={() => setShowApiModal(false)} />
     </View>
   );
 }
