@@ -73,6 +73,7 @@ return [
                 'POST v1/admission/apply' => 'v1/admission/apply',
                 'PUT v1/admission/<id:\d+>/status' => 'v1/admission/update-status',
                 'POST v1/admission/<id:\d+>/enroll' => 'v1/admission/enroll',
+                'POST v1/school-class/<id:\d+>/set-teacher' => 'v1/school-class/set-teacher',
                 'GET v1/admission/stats' => 'v1/admission/stats',
                 'GET v1/cms/public' => 'v1/cms/public',
                 'GET,POST v1/cms/seed-demo' => 'v1/cms/seed-demo',
