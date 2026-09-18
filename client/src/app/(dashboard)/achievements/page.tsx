@@ -2,10 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Achievement, Certificate, Student } from '@/types';
 import { Award, FileText, CheckCircle2, XCircle, Plus, Star, ShieldCheck, Trophy, Sparkles } from 'lucide-react';
 
 export default function AchievementsPage() {
+  const { user } = useAuth();
+  const roles = user?.roles || [];
+  const canManage = roles.some((r) =>
+    ['super_admin', 'admin', 'director', 'teacher'].includes(r)
+  );
+  const isStudent = roles.includes('student');
+
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -137,22 +145,24 @@ export default function AchievementsPage() {
             </button>
           </div>
 
-          {activeTab === 'badges' ? (
-            <button
-              onClick={() => setAwardModalOpen(true)}
-              className="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-lg transition font-medium text-xs shadow-sm"
-            >
-              <Plus size={16} />
-              Yutuq topshirish
-            </button>
-          ) : (
-            <button
-              onClick={() => setUploadCertModalOpen(true)}
-              className="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-lg transition font-medium text-xs shadow-sm"
-            >
-              <Plus size={16} />
-              Sertifikat qo'shish
-            </button>
+          {canManage && (
+            activeTab === 'badges' ? (
+              <button
+                onClick={() => setAwardModalOpen(true)}
+                className="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-lg transition font-medium text-xs shadow-sm"
+              >
+                <Plus size={16} />
+                Yutuq topshirish
+              </button>
+            ) : (
+              <button
+                onClick={() => setUploadCertModalOpen(true)}
+                className="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-lg transition font-medium text-xs shadow-sm"
+              >
+                <Plus size={16} />
+                Sertifikat qo'shish
+              </button>
+            )
           )}
         </div>
       </div>

@@ -3,8 +3,105 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Lesson, Student, Attendance, Enrollment } from '@/types';
-import { CheckCircle2, Clock, XCircle, AlertCircle, Save, Check } from 'lucide-react';
+import { CheckCircle2, Clock, XCircle, AlertCircle, Save, Check, CalendarCheck } from 'lucide-react';
+
+function StudentAttendanceView() {
+  const [records, setRecords] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const statusMap: Record<number, { label: string; color: string }> = {
+    1: { label: 'Qatnashdi', color: 'text-emerald-700 bg-emerald-50 border border-emerald-200' },
+    2: { label: 'Kechikdi', color: 'text-amber-700 bg-amber-50 border border-amber-200' },
+    3: { label: 'Qatnashmadi', color: 'text-rose-700 bg-rose-50 border border-rose-200' },
+    4: { label: 'Sababli', color: 'text-blue-700 bg-blue-50 border border-blue-200' },
+  };
+
+  useEffect(() => {
+    api.getAll<any>('attendance', { expand: 'lesson.subject', 'per-page': '200' })
+      .then((res) => setRecords(res.items || []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const present = records.filter((r) => r.status === 1).length;
+  const total = records.length;
+  const pct = total > 0 ? Math.round((present / total) * 100) : 0;
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Mening Davomatim</h1>
+        <p className="text-slate-500 text-sm">Darslarga qatnashish ko'rsatkichingiz va davomat statistikasi</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white rounded-xl border border-slate-200 p-5 text-center shadow-sm">
+          <p className="text-3xl font-extrabold text-emerald-600">{pct}%</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Davomat Ko'rsatkichi</p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-5 text-center shadow-sm">
+          <p className="text-3xl font-extrabold text-indigo-600">{present}</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Qatnashgan Darslar</p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-5 text-center shadow-sm">
+          <p className="text-3xl font-extrabold text-rose-600">{records.filter((r) => r.status === 3).length}</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Qoldirilgan Darslar</p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+          <h2 className="font-bold text-slate-800 flex items-center gap-2">
+            <CalendarCheck className="text-indigo-600" size={18} /> Davomat Tarixi
+          </h2>
+          <span className="text-xs text-slate-500">{records.length} ta yozuv</span>
+        </div>
+
+        {loading ? (
+          <div className="p-12 text-center text-slate-400">Yuklanmoqda...</div>
+        ) : records.length === 0 ? (
+          <div className="p-12 text-center text-slate-400">Davomat yozuvlari mavjud emas.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                  <th className="p-4 text-left">Fan</th>
+                  <th className="p-4 text-left">Holat</th>
+                  <th className="p-4 text-left">Izoh</th>
+                  <th className="p-4 text-right">Sana</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {records.map((r) => {
+                  const st = statusMap[r.status] || { label: 'Noma\'lum', color: 'text-slate-600 bg-slate-100' };
+                  return (
+                    <tr key={r.id} className="hover:bg-slate-50 transition">
+                      <td className="p-4 font-semibold text-slate-900">
+                        {r.lesson?.subject?.name || 'Fan'}
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${st.color}`}>
+                          {st.label}
+                        </span>
+                      </td>
+                      <td className="p-4 text-slate-500 text-xs">{r.remarks || '—'}</td>
+                      <td className="p-4 text-right text-xs text-slate-400">
+                        {r.created_at ? new Date(r.created_at * 1000).toLocaleDateString('uz-UZ') : '—'}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const STATUS_OPTS = [
   { id: 1, label: 'Qatnashdi', color: 'bg-emerald-600 text-white border-emerald-600', inactiveColor: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
@@ -14,6 +111,10 @@ const STATUS_OPTS = [
 ];
 
 export default function AttendancePage() {
+  const { user } = useAuth();
+  const roles = user?.roles || [];
+  const isStudent = roles.includes('student');
+
   const searchParams = useSearchParams();
   const initialLessonId = searchParams.get('lesson_id');
 
@@ -151,6 +252,10 @@ export default function AttendancePage() {
     },
     {} as Record<number, number>
   );
+
+  if (isStudent) {
+    return <StudentAttendanceView />;
+  }
 
   return (
     <div className="space-y-6">

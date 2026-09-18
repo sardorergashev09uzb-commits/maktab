@@ -3,10 +3,102 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Lesson, Student, Grade, GradeCategory, DeadlineInfo, Enrollment } from '@/types';
-import { Award, Clock, AlertTriangle, ShieldCheck, CheckCircle2, XCircle, Send } from 'lucide-react';
+import { Award, Clock, AlertTriangle, ShieldCheck, CheckCircle2, XCircle, Send, BookOpen } from 'lucide-react';
+
+function StudentGradesView() {
+  const [grades, setGrades] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.getAll<any>('grade', { expand: 'lesson.subject,gradeCategory', 'per-page': '200' })
+      .then((res) => setGrades(res.items || []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Mening Baholarim</h1>
+        <p className="text-slate-500 text-sm">O'qituvchilar tomonidan darslar bo'yicha qo'yilgan baholar va izohlar</p>
+      </div>
+
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+          <h2 className="font-bold text-slate-800 flex items-center gap-2">
+            <Award className="text-indigo-600" size={18} /> Baholar Jurnali
+          </h2>
+          <span className="text-xs text-slate-500">{grades.length} ta baho</span>
+        </div>
+
+        {loading ? (
+          <div className="p-12 text-center text-slate-400">Yuklanmoqda...</div>
+        ) : grades.length === 0 ? (
+          <div className="p-12 text-center text-slate-400">Hozircha qo'yilgan baholar mavjud emas.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                  <th className="p-4">Fan</th>
+                  <th className="p-4">Kategoriya</th>
+                  <th className="p-4">Ball</th>
+                  <th className="p-4">Maks</th>
+                  <th className="p-4">Izoh</th>
+                  <th className="p-4 text-right">Sana</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {grades.map((g) => (
+                  <tr key={g.id} className="hover:bg-slate-50 transition">
+                    <td className="p-4 font-semibold text-slate-900">
+                      {g.lesson?.subject?.name || 'Fan'}
+                    </td>
+                    <td className="p-4 text-slate-600">
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+                        {g.gradeCategory?.name || 'Oraliq'}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span
+                        className={`font-extrabold text-base ${
+                          g.score >= g.max_score * 0.85
+                            ? 'text-emerald-600'
+                            : g.score >= g.max_score * 0.7
+                            ? 'text-indigo-600'
+                            : g.score >= g.max_score * 0.55
+                            ? 'text-amber-600'
+                            : 'text-rose-600'
+                        }`}
+                      >
+                        {g.score}
+                      </span>
+                    </td>
+                    <td className="p-4 text-slate-400 text-xs">{g.max_score || 100}</td>
+                    <td className="p-4 text-slate-600 text-xs max-w-xs truncate">
+                      {g.comment || '—'}
+                    </td>
+                    <td className="p-4 text-right text-xs text-slate-400">
+                      {g.created_at ? new Date(g.created_at * 1000).toLocaleDateString('uz-UZ') : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function GradesPage() {
+  const { user } = useAuth();
+  const roles = user?.roles || [];
+  const isStudent = roles.includes('student');
+
   const searchParams = useSearchParams();
   const initialLessonId = searchParams.get('lesson_id');
 
@@ -222,6 +314,10 @@ export default function GradesPage() {
         );
     }
   };
+
+  if (isStudent) {
+    return <StudentGradesView />;
+  }
 
   return (
     <div className="space-y-6">

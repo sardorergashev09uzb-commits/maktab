@@ -2,11 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Assignment, SchoolClass, Subject, Teacher } from '@/types';
 import Link from 'next/link';
-import { Plus, BookOpen, Calendar, Clock, CheckCircle, FileText, ArrowRight, User } from 'lucide-react';
+import { Plus, BookOpen, Clock, ArrowRight, X, FileText } from 'lucide-react';
 
 export default function AssignmentsPage() {
+  const { user } = useAuth();
+  const roles = user?.roles || [];
+  const canManage = roles.some((r) =>
+    ['super_admin', 'admin', 'director', 'zavuch', 'teacher'].includes(r)
+  );
+  const isStudent = roles.includes('student');
+
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -28,25 +36,31 @@ export default function AssignmentsPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [assRes, classRes, subRes, teachRes] = await Promise.all([
-        api.getAll<Assignment>('assignment'),
-        api.getAll<SchoolClass>('school-class'),
-        api.getAll<Subject>('subject'),
-        api.getAll<Teacher>('teacher'),
-      ]);
+      const promises: Promise<any>[] = [api.getAll<Assignment>('assignment')];
+      if (canManage) {
+        promises.push(
+          api.getAll<SchoolClass>('school-class'),
+          api.getAll<Subject>('subject'),
+          api.getAll<Teacher>('teacher')
+        );
+      }
 
-      setAssignments(assRes.items || []);
-      setClasses(classRes.items || []);
-      setSubjects(subRes.items || []);
-      setTeachers(teachRes.items || []);
+      const [assRes, classRes, subRes, teachRes] = await Promise.all(promises);
 
-      if (classRes.items?.length && !formData.school_class_id) {
-        setFormData((prev) => ({
-          ...prev,
-          school_class_id: classRes.items[0].id,
-          subject_id: subRes.items[0]?.id || 0,
-          teacher_id: teachRes.items[0]?.id || 0,
-        }));
+      setAssignments(assRes?.items || []);
+      if (canManage) {
+        setClasses(classRes?.items || []);
+        setSubjects(subRes?.items || []);
+        setTeachers(teachRes?.items || []);
+
+        if (classRes?.items?.length && !formData.school_class_id) {
+          setFormData((prev) => ({
+            ...prev,
+            school_class_id: classRes.items[0].id,
+            subject_id: subRes?.items?.[0]?.id || 0,
+            teacher_id: teachRes?.items?.[0]?.id || 0,
+          }));
+        }
       }
     } catch (err) {
       console.error(err);
@@ -61,6 +75,7 @@ export default function AssignmentsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canManage) return;
     try {
       await api.create('assignment', {
         ...formData,
@@ -77,16 +92,24 @@ export default function AssignmentsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Uy Vazifalari (LMS)</h1>
-          <p className="text-slate-500 text-sm">O'quvchilarga berilgan topshiriqlar, muddatlar va tekshirish jurnali</p>
+          <h1 className="text-2xl font-bold text-slate-900">
+            {isStudent ? 'Mening Uy Vazifalarim' : 'Uy Vazifalari (LMS)'}
+          </h1>
+          <p className="text-slate-500 text-sm">
+            {isStudent
+              ? 'Darslar bo\'yicha berilgan topshiriqlar va muddatlar'
+              : 'O\'quvchilarga berilgan topshiriqlar, muddatlar va tekshirish jurnali'}
+          </p>
         </div>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium text-sm self-start shadow-sm"
-        >
-          <Plus size={18} />
-          Vazifa berish
-        </button>
+        {canManage && (
+          <button
+            onClick={() => setModalOpen(true)}
+            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium text-sm self-start shadow-sm"
+          >
+            <Plus size={18} />
+            Vazifa berish
+          </button>
+        )}
       </div>
 
       {/* Grid of assignments */}
@@ -96,7 +119,9 @@ export default function AssignmentsPage() {
         </div>
       ) : assignments.length === 0 ? (
         <div className="p-12 text-center text-slate-500 bg-white rounded-xl border border-slate-200">
-          Hozircha faol uy vazifalari mavjud emas. Yuqoridagi tugma orqali vazifa bering.
+          {canManage
+            ? 'Hozircha faol uy vazifalari mavjud emas. Yuqoridagi tugma orqali vazifa bering.'
+            : 'Hozircha sizga biriktirilgan faol uy vazifalari mavjud emas.'}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -113,7 +138,9 @@ export default function AssignmentsPage() {
                     <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700">
                       {item.schoolClass?.name || 'Sinf'}
                     </span>
-                    <span className="text-xs font-semibold text-slate-500">Max: {item.max_score} ball</span>
+                    <span className="text-xs font-semibold text-slate-500">
+                      Max: {item.max_score} ball
+                    </span>
                   </div>
 
                   <div>
@@ -132,15 +159,26 @@ export default function AssignmentsPage() {
                     <span className="flex items-center gap-1">
                       <Clock size={14} className="text-amber-500" /> Muddat: {item.due_date?.slice(0, 10)}
                     </span>
-                    <span className="font-semibold text-slate-700">{subCount} ta topshirilgan</span>
+                    {canManage && (
+                      <span className="font-semibold text-slate-700">{subCount} ta topshirilgan</span>
+                    )}
                   </div>
 
-                  <Link
-                    href={`/submissions?assignment_id=${item.id}`}
-                    className="w-full inline-flex items-center justify-center gap-2 py-2 rounded-lg bg-slate-50 text-indigo-600 hover:bg-indigo-50 font-bold text-xs transition border border-slate-200"
-                  >
-                    Topshiriqlarni tekshirish <ArrowRight size={14} />
-                  </Link>
+                  {canManage ? (
+                    <Link
+                      href={`/submissions?assignment_id=${item.id}`}
+                      className="w-full inline-flex items-center justify-center gap-2 py-2 rounded-lg bg-slate-50 text-indigo-600 hover:bg-indigo-50 font-bold text-xs transition border border-slate-200"
+                    >
+                      Topshiriqlarni tekshirish <ArrowRight size={14} />
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/portal/student?tab=tasks`}
+                      className="w-full inline-flex items-center justify-center gap-2 py-2 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-xs transition border border-indigo-200"
+                    >
+                      Topshiriqni topshirish / Ko'rish <ArrowRight size={14} />
+                    </Link>
+                  )}
                 </div>
               </div>
             );
@@ -149,13 +187,20 @@ export default function AssignmentsPage() {
       )}
 
       {/* Create Modal */}
-      {modalOpen && (
+      {modalOpen && canManage && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900">Yangi uy vazifasi berish</h3>
+            <div className="flex items-center justify-between border-b pb-3">
+              <h3 className="text-lg font-bold text-slate-900">Yangi uy vazifasi berish</h3>
+              <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase mb-1">Vazifa mavzusi / Sarlavha</label>
+                <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                  Vazifa mavzusi / Sarlavha
+                </label>
                 <input
                   type="text"
                   required
@@ -236,7 +281,7 @@ export default function AssignmentsPage() {
                     max="100"
                     value={formData.max_score}
                     onChange={(e) => setFormData({ ...formData, max_score: Number(e.target.value) })}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-bold"
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none"
                   />
                 </div>
               </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Schedule, SchoolClass, Subject, Teacher, Room, AcademicYear } from '@/types';
 import { Plus, Clock, MapPin, User as UserIcon, BookOpen } from 'lucide-react';
 
@@ -15,6 +16,11 @@ const DAYS = [
 ];
 
 export default function SchedulePage() {
+  const { user } = useAuth();
+  const roles = user?.roles || [];
+  const canManage = roles.some((r) =>
+    ['super_admin', 'admin', 'director', 'zavuch'].includes(r)
+  );
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -104,13 +110,15 @@ export default function SchedulePage() {
           <h1 className="text-2xl font-bold text-slate-900">Dars Jadvali</h1>
           <p className="text-slate-500 text-sm">Haftalik dars taqsimoti, o'qituvchilar va xonalar biriktirmasi</p>
         </div>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium text-sm self-start"
-        >
-          <Plus size={18} />
-          Dars qo'shish
-        </button>
+        {canManage && (
+          <button
+            onClick={() => setModalOpen(true)}
+            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium text-sm self-start"
+          >
+            <Plus size={18} />
+            Dars qo'shish
+          </button>
+        )}
       </div>
 
       {/* Class filter and Days bar */}
@@ -204,7 +212,7 @@ export default function SchedulePage() {
       )}
 
       {/* Modal */}
-      {modalOpen && (
+      {modalOpen && canManage && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl space-y-4">
             <h3 className="text-lg font-bold text-slate-900">Jadvalga dars qo'shish</h3>

@@ -2,11 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Lesson, SchoolClass, Subject, Teacher, Room, AcademicYear } from '@/types';
 import Link from 'next/link';
 import { Plus, BookOpen, Clock, MapPin, CheckCircle2, UserCheck, Award, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function LessonsPage() {
+  const { user } = useAuth();
+  const roles = user?.roles || [];
+  const canCreate = roles.some((r) =>
+    ['super_admin', 'admin', 'director', 'zavuch', 'teacher'].includes(r)
+  );
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -94,13 +100,15 @@ export default function LessonsPage() {
           <h1 className="text-2xl font-bold text-slate-900">Darslar (Real instansiyalar)</h1>
           <p className="text-slate-500 text-sm">Har bir sanadagi haqiqiy dars mashg'ulotlari, davomat va mavzular</p>
         </div>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium text-sm self-start"
-        >
-          <Plus size={18} />
-          Dars o'tishni rejalashtirish
-        </button>
+        {canCreate && (
+          <button
+            onClick={() => setModalOpen(true)}
+            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium text-sm self-start"
+          >
+            <Plus size={18} />
+            Dars o'tishni rejalashtirish
+          </button>
+        )}
       </div>
 
       {/* Filter by date */}
@@ -202,7 +210,7 @@ export default function LessonsPage() {
       )}
 
       {/* Modal */}
-      {modalOpen && (
+      {modalOpen && canCreate && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl space-y-4">
             <h3 className="text-lg font-bold text-slate-900">Yangi dars kiritish</h3>
