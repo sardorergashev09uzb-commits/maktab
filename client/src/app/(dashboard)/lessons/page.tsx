@@ -42,11 +42,11 @@ export default function LessonsPage() {
     try {
       setLoading(true);
       const [lesRes, classRes, subRes, teachRes, roomRes, yearRes] = await Promise.all([
-        api.getAll<Lesson>('lesson', filterDate ? { date: filterDate } : undefined),
-        api.getAll<SchoolClass>('school-class'),
-        api.getAll<Subject>('subject'),
-        api.getAll<Teacher>('teacher'),
-        api.getAll<Room>('room'),
+        api.getAll<Lesson>('lesson', filterDate ? { date: filterDate, 'per-page': '100' } : { 'per-page': '100' }),
+        api.getAll<SchoolClass>('school-class', { 'per-page': '200' }),
+        api.getAll<Subject>('subject', { 'per-page': '200' }),
+        api.getAll<Teacher>('teacher', { expand: 'user', 'per-page': '200' }),
+        api.getAll<Room>('room', { 'per-page': '100' }),
         api.getAll<AcademicYear>('academic-year'),
       ]);
 

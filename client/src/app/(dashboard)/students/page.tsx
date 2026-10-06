@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Student, SchoolClass, AcademicYear } from '@/types';
 import {
   Plus, Search, Trash2, RefreshCw, X, User,
@@ -9,6 +10,10 @@ import {
 } from 'lucide-react';
 
 export default function StudentsPage() {
+  const { user } = useAuth();
+  const userRoles = user?.roles || [];
+  const canManage = userRoles.some(r => ['super_admin', 'admin', 'director', 'zavuch'].includes(r));
+
   const [students, setStudents] = useState<Student[]>([]);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
@@ -140,10 +145,12 @@ export default function StudentsPage() {
           <button onClick={() => loadData(searchQuery)} className="p-2.5 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-colors">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <button onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm active:scale-95">
-            <Plus size={18} /> O'quvchi qo'shish
-          </button>
+          {canManage && (
+            <button onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm active:scale-95">
+              <Plus size={18} /> O'quvchi qo'shish
+            </button>
+          )}
         </div>
       </div>
 

@@ -331,5 +331,11 @@ export const api = {
     fetchApi<void>(`/${resource}/${id}`, {
       method: 'DELETE',
     }),
+
+  post: <T = any>(endpoint: string, data?: any) =>
+    fetchApi<T>(endpoint.startsWith('/') ? endpoint : `/${endpoint}`, {
+      method: 'POST',
+      body: data !== undefined ? JSON.stringify(data) : undefined,
+    }),
 };
 

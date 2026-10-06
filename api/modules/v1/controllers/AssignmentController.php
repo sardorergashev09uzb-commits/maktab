@@ -35,16 +35,16 @@ class AssignmentController extends ActiveController
 
         $classId = Yii::$app->request->get('class_id');
         if ($classId) {
-            $query->andWhere(['school_class_id' => $classId]);
+            $query->andWhere(['{{%assignment}}.school_class_id' => $classId]);
         }
 
         $subjectId = Yii::$app->request->get('subject_id');
         if ($subjectId) {
-            $query->andWhere(['subject_id' => $subjectId]);
+            $query->andWhere(['{{%assignment}}.subject_id' => $subjectId]);
         }
 
         return new ActiveDataProvider([
-            'query' => $query->orderBy(['due_date' => SORT_ASC]),
+            'query' => $query->orderBy(['{{%assignment}}.due_date' => SORT_ASC]),
             'pagination' => ['pageSize' => 50],
         ]);
     }

@@ -37,21 +37,21 @@ class LessonController extends ActiveController
 
         $date = \Yii::$app->request->get('date');
         if ($date) {
-            $query->andWhere(['date' => $date]);
+            $query->andWhere(['{{%lesson}}.date' => $date]);
         }
 
         $classId = \Yii::$app->request->get('class_id');
         if ($classId) {
-            $query->andWhere(['school_class_id' => $classId]);
+            $query->andWhere(['{{%lesson}}.school_class_id' => $classId]);
         }
 
         $teacherId = \Yii::$app->request->get('teacher_id');
         if ($teacherId) {
-            $query->andWhere(['teacher_id' => $teacherId]);
+            $query->andWhere(['{{%lesson}}.teacher_id' => $teacherId]);
         }
 
         return new ActiveDataProvider([
-            'query' => $query->orderBy(['date' => SORT_DESC, 'start_time' => SORT_ASC]),
+            'query' => $query->orderBy(['{{%lesson}}.date' => SORT_DESC, '{{%lesson}}.start_time' => SORT_ASC]),
             'pagination' => ['pageSize' => 50],
         ]);
     }

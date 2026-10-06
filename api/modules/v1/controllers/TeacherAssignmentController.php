@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace api\modules\v1\controllers;
 
 use Yii;
@@ -32,13 +32,13 @@ class TeacherAssignmentController extends ActiveController
         $query = TeacherAssignment::find()->with(['teacher.user', 'subject', 'schoolClass', 'academicYear']);
 
         $classId = Yii::$app->request->get('school_class_id');
-        if ($classId) $query->andWhere(['school_class_id' => (int)$classId]);
+        if ($classId) $query->andWhere(['{{%teacher_assignment}}.school_class_id' => (int)$classId]);
 
         $teacherId = Yii::$app->request->get('teacher_id');
-        if ($teacherId) $query->andWhere(['teacher_id' => (int)$teacherId]);
+        if ($teacherId) $query->andWhere(['{{%teacher_assignment}}.teacher_id' => (int)$teacherId]);
 
         $yearId = Yii::$app->request->get('academic_year_id');
-        if ($yearId) $query->andWhere(['academic_year_id' => (int)$yearId]);
+        if ($yearId) $query->andWhere(['{{%teacher_assignment}}.academic_year_id' => (int)$yearId]);
 
         return new \yii\data\ActiveDataProvider([
             'query' => $query,

@@ -36,7 +36,7 @@ class AttendanceController extends ActiveController
 
         $lessonId = Yii::$app->request->get('lesson_id');
         if ($lessonId) {
-            $query->andWhere(['lesson_id' => $lessonId]);
+            $query->andWhere(['{{%attendance}}.lesson_id' => $lessonId]);
         }
 
         return new ActiveDataProvider([

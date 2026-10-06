@@ -65,4 +65,9 @@ class Enrollment extends ActiveRecord
     {
         return $this->hasOne(AcademicYear::class, ['id' => 'academic_year_id']);
     }
+
+    public function extraFields()
+    {
+        return ['student', 'schoolClass', 'academicYear'];
+    }
 }

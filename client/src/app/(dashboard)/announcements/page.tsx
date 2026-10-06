@@ -2,14 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Announcement } from '@/types';
-import { Bell, Plus, Filter, Calendar, Users, AlertCircle, Pin } from 'lucide-react';
+import { Bell, Plus, Filter, Calendar, X } from 'lucide-react';
 
 export default function AnnouncementsPage() {
+  const { user } = useAuth();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [modalOpen, setModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const userRoles = user?.roles || [];
+  const canCreate = userRoles.some(r => ['super_admin', 'admin', 'director', 'zavuch', 'teacher'].includes(r));
 
   const [formData, setFormData] = useState({
     title: '',
@@ -23,10 +30,11 @@ export default function AnnouncementsPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const res = await api.getAll<Announcement>('announcement');
+      setError(null);
+      const res = await api.getAll<Announcement>('announcement', { expand: 'author' });
       setAnnouncements(res.items || []);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setError(err.message || 'E\'lonlarni yuklashda xatolik');
     } finally {
       setLoading(false);
     }
@@ -39,24 +47,18 @@ export default function AnnouncementsPage() {
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setSubmitting(true);
       await api.create('announcement', {
         ...formData,
         published_at: Math.floor(Date.now() / 1000),
       });
-
-      alert('E\'lon muvaffaqiyatli chop etildi!');
       setModalOpen(false);
-      setFormData({
-        title: '',
-        content: '',
-        target_role: 'all',
-        priority: 'normal',
-        is_published: 1,
-        published_at: Math.floor(Date.now() / 1000),
-      });
+      setFormData({ title: '', content: '', target_role: 'all', priority: 'normal', is_published: 1, published_at: Math.floor(Date.now() / 1000) });
       loadData();
     } catch (err: any) {
       alert(err.message || 'E\'lon yaratishda xatolik yuz berdi');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -64,6 +66,12 @@ export default function AnnouncementsPage() {
     if (roleFilter === 'all') return true;
     return ann.target_role === roleFilter || ann.target_role === 'all';
   });
+
+  const formatDate = (val: any) => {
+    if (!val) return '';
+    const ts = typeof val === 'number' ? val * 1000 : new Date(val).getTime();
+    return new Date(ts).toLocaleDateString('uz-UZ', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
 
   return (
     <div className="space-y-6">
@@ -74,13 +82,15 @@ export default function AnnouncementsPage() {
             Maktab miqyosidagi rasmiy xabarlar, o'quvchilar, ota-onalar va o'qituvchilar uchun e'lonlar taxtasi
           </p>
         </div>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium text-sm self-start shadow-sm"
-        >
-          <Plus size={18} />
-          Yangi e'lon chop etish
-        </button>
+        {canCreate && (
+          <button
+            onClick={() => setModalOpen(true)}
+            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium text-sm self-start shadow-sm"
+          >
+            <Plus size={18} />
+            Yangi e'lon chop etish
+          </button>
+        )}
       </div>
 
       {/* Role Filters */}
@@ -118,11 +128,7 @@ export default function AnnouncementsPage() {
       ) : (
         <div className="space-y-4">
           {filteredAnnouncements.map((ann) => {
-            const date = new Date(ann.published_at * 1000).toLocaleDateString('uz-UZ', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            });
+            const date = formatDate(ann.published_at);
 
             return (
               <div
@@ -177,7 +183,7 @@ export default function AnnouncementsPage() {
       )}
 
       {/* Create Modal */}
-      {modalOpen && (
+      {modalOpen && canCreate && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl space-y-4">
             <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -249,9 +255,10 @@ export default function AnnouncementsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm font-medium"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm font-medium disabled:opacity-50"
                 >
-                  E'lonni chop etish
+                  {submitting ? 'Chop etilmoqda...' : 'E\'lonni chop etish'}
                 </button>
               </div>
             </form>

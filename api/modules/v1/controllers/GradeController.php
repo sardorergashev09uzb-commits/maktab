@@ -38,12 +38,12 @@ class GradeController extends ActiveController
 
         $lessonId = Yii::$app->request->get('lesson_id');
         if ($lessonId) {
-            $query->andWhere(['lesson_id' => $lessonId]);
+            $query->andWhere(['{{%grade}}.lesson_id' => $lessonId]);
         }
 
         $studentId = Yii::$app->request->get('student_id');
         if ($studentId) {
-            $query->andWhere(['student_id' => $studentId]);
+            $query->andWhere(['{{%grade}}.student_id' => $studentId]);
         }
 
         return new ActiveDataProvider([

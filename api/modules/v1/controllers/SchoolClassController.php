@@ -70,7 +70,10 @@ class SchoolClassController extends ActiveController
                 'pageSize' => (int)Yii::$app->request->get('per-page', 100),
             ],
             'sort' => [
-                'defaultOrder' => ['{{%school_class}}.grade_level' => SORT_ASC, '{{%school_class}}.name' => SORT_ASC],
+                'defaultOrder' => ['grade_level' => SORT_ASC, 'name' => SORT_ASC],
+                'attributes' => [
+                    'id', 'name', 'grade_level', 'status', 'created_at',
+                ],
             ],
         ]);
     }

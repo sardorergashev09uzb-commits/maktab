@@ -48,11 +48,11 @@ export default function SchedulePage() {
     try {
       setLoading(true);
       const [schedRes, classRes, subRes, teachRes, roomRes, yearRes] = await Promise.all([
-        api.getAll<Schedule>('schedule'),
-        api.getAll<SchoolClass>('school-class'),
-        api.getAll<Subject>('subject'),
-        api.getAll<Teacher>('teacher'),
-        api.getAll<Room>('room'),
+        api.getAll<Schedule>('schedule', { 'per-page': '500' }),
+        api.getAll<SchoolClass>('school-class', { 'per-page': '200' }),
+        api.getAll<Subject>('subject', { 'per-page': '200' }),
+        api.getAll<Teacher>('teacher', { expand: 'user', 'per-page': '200' }),
+        api.getAll<Room>('room', { 'per-page': '100' }),
         api.getAll<AcademicYear>('academic-year'),
       ]);
 

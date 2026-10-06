@@ -35,12 +35,12 @@ class ScheduleController extends ActiveController
 
         $classId = \Yii::$app->request->get('class_id');
         if ($classId) {
-            $query->andWhere(['school_class_id' => $classId]);
+            $query->andWhere(['{{%schedule}}.school_class_id' => $classId]);
         }
 
         $teacherId = \Yii::$app->request->get('teacher_id');
         if ($teacherId) {
-            $query->andWhere(['teacher_id' => $teacherId]);
+            $query->andWhere(['{{%schedule}}.teacher_id' => $teacherId]);
         }
 
         return new ActiveDataProvider([

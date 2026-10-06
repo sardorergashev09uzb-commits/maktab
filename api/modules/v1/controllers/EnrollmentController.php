@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace api\modules\v1\controllers;
 
 use Yii;
@@ -32,21 +32,23 @@ class EnrollmentController extends ActiveController
         $query = Enrollment::find()->with(['student.user', 'schoolClass', 'academicYear']);
 
         $classId = Yii::$app->request->get('school_class_id');
-        if ($classId) $query->andWhere(['school_class_id' => (int)$classId]);
+        if ($classId) $query->andWhere(['{{%enrollment}}.school_class_id' => (int)$classId]);
 
         $studentId = Yii::$app->request->get('student_id');
-        if ($studentId) $query->andWhere(['student_id' => (int)$studentId]);
+        if ($studentId) $query->andWhere(['{{%enrollment}}.student_id' => (int)$studentId]);
 
         $yearId = Yii::$app->request->get('academic_year_id');
-        if ($yearId) $query->andWhere(['academic_year_id' => (int)$yearId]);
+        if ($yearId) $query->andWhere(['{{%enrollment}}.academic_year_id' => (int)$yearId]);
 
         $status = Yii::$app->request->get('status');
-        if ($status !== null) $query->andWhere(['status' => (int)$status]);
+        if ($status !== null && $status !== '') {
+            $query->andWhere(['{{%enrollment}}.status' => (int)$status]);
+        }
 
         return new \yii\data\ActiveDataProvider([
             'query' => $query,
             'pagination' => ['pageSize' => 200],
-            'sort' => ['defaultOrder' => ['created_at' => SORT_DESC]],
+            'sort' => ['defaultOrder' => ['{{%enrollment}}.created_at' => SORT_DESC]],
         ]);
     }
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { SchoolClass, Room, AcademicYear, Teacher, Student, Subject } from '@/types';
 import {
   Plus, Search, Trash2, RefreshCw, X, School, Users, DoorOpen, Calendar,
@@ -9,6 +10,10 @@ import {
 } from 'lucide-react';
 
 export default function ClassesPage() {
+  const { user } = useAuth();
+  const userRoles = user?.roles || [];
+  const canManage = userRoles.some(r => ['super_admin', 'admin', 'director', 'zavuch'].includes(r));
+
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
@@ -144,10 +149,8 @@ export default function ClassesPage() {
     if (!teacherModal || !selectedTeacherId) { alert("O'qituvchi tanlang!"); return; }
     try {
       setSubmitting(true);
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://sardorbek.alwaysdata.net/v1'}/school-class/${teacherModal.classId}/set-teacher`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-        body: JSON.stringify({ teacher_id: Number(selectedTeacherId) }),
+      await api.post(`/school-class/${teacherModal.classId}/set-teacher`, {
+        teacher_id: Number(selectedTeacherId),
       });
       setTeacherModal(null);
       setSelectedTeacherId('');
@@ -208,14 +211,22 @@ export default function ClassesPage() {
 
   const handleRemoveEnrollment = async (enrollId: number) => {
     if (!confirm("O'quvchini sinfdan chiqarmoqchimisiz?")) return;
-    await api.remove('enrollment', enrollId);
-    if (expandedClass) loadClassPanel(expandedClass);
+    try {
+      await api.remove('enrollment', enrollId);
+      if (expandedClass) loadClassPanel(expandedClass);
+    } catch (err: any) {
+      alert(err.message || "O'quvchini chiqarishda xatolik");
+    }
   };
 
   const handleRemoveAssignment = async (assignId: number) => {
     if (!confirm("Bu biriktirishni o'chirmoqchimisiz?")) return;
-    await api.remove('teacher-assignment', assignId);
-    if (expandedClass) loadClassPanel(expandedClass);
+    try {
+      await api.remove('teacher-assignment', assignId);
+      if (expandedClass) loadClassPanel(expandedClass);
+    } catch (err: any) {
+      alert(err.message || "Biriktirishni o'chirishda xatolik");
+    }
   };
 
   const handleDeleteClass = async (id: number, name: string) => {
@@ -258,13 +269,15 @@ export default function ClassesPage() {
           <button onClick={loadData} className="p-2.5 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-colors" title="Yangilash">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm active:scale-95"
-          >
-            <Plus size={18} />
-            Yangi sinf
-          </button>
+          {canManage && (
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm active:scale-95"
+            >
+              <Plus size={18} />
+              Yangi sinf
+            </button>
+          )}
         </div>
       </div>
 
