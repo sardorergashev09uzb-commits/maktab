@@ -72,8 +72,8 @@ class Student extends ActiveRecord
     public function getCurrentEnrollment()
     {
         return $this->hasOne(Enrollment::class, ['student_id' => 'id'])
-            ->where(['status' => Enrollment::STATUS_ACTIVE])
-            ->orderBy(['id' => SORT_DESC]);
+            ->onCondition([Enrollment::tableName() . '.status' => Enrollment::STATUS_ACTIVE])
+            ->orderBy([Enrollment::tableName() . '.id' => SORT_DESC]);
     }
 
     public function getParentStudents()

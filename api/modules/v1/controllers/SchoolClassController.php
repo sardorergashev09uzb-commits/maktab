@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace api\modules\v1\controllers;
 
 use Yii;
@@ -38,8 +38,11 @@ class SchoolClassController extends ActiveController
         if (in_array('academicYear', $expandList)) $joins[] = 'academicYear';
         if (in_array('room', $expandList)) $joins[] = 'room';
         if (in_array('classTeacher', $expandList) || in_array('classTeacher.user', $expandList)) {
-            $joins[] = 'classTeacher';
-            $joins[] = 'classTeacher.user';
+            $schema = SchoolClass::getTableSchema();
+            if ($schema && $schema->getColumn('class_teacher_id') !== null) {
+                $joins[] = 'classTeacher';
+                $joins[] = 'classTeacher.user';
+            }
         }
 
         if (!empty($joins)) {
@@ -67,7 +70,7 @@ class SchoolClassController extends ActiveController
                 'pageSize' => (int)Yii::$app->request->get('per-page', 100),
             ],
             'sort' => [
-                'defaultOrder' => ['grade_level' => SORT_ASC, 'name' => SORT_ASC],
+                'defaultOrder' => ['{{%school_class}}.grade_level' => SORT_ASC, '{{%school_class}}.name' => SORT_ASC],
             ],
         ]);
     }

@@ -42,13 +42,41 @@ class StudentController extends ActiveController
             ]);
         }
 
+        $status = \Yii::$app->request->get('status');
+        if ($status !== null && $status !== '') {
+            $query->andWhere(['{{%student}}.status' => (int)$status]);
+        }
+
+        $classId = \Yii::$app->request->get('school_class_id');
+        if ($classId) {
+            $query->andWhere(['{{%enrollment}}.school_class_id' => (int)$classId]);
+        }
+
         return new \yii\data\ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => (int)\Yii::$app->request->get('per-page', 50),
             ],
             'sort' => [
-                'defaultOrder' => ['id' => SORT_DESC],
+                'defaultOrder' => ['{{%student}}.id' => SORT_DESC],
+                'attributes' => [
+                    'id' => [
+                        'asc' => ['{{%student}}.id' => SORT_ASC],
+                        'desc' => ['{{%student}}.id' => SORT_DESC],
+                    ],
+                    'student_code' => [
+                        'asc' => ['{{%student}}.student_code' => SORT_ASC],
+                        'desc' => ['{{%student}}.student_code' => SORT_DESC],
+                    ],
+                    'status' => [
+                        'asc' => ['{{%student}}.status' => SORT_ASC],
+                        'desc' => ['{{%student}}.status' => SORT_DESC],
+                    ],
+                    'created_at' => [
+                        'asc' => ['{{%student}}.created_at' => SORT_ASC],
+                        'desc' => ['{{%student}}.created_at' => SORT_DESC],
+                    ],
+                ],
             ],
         ]);
     }

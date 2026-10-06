@@ -42,7 +42,8 @@ class SurveyQuestion extends ActiveRecord
 
     public function getOptions()
     {
-        return $this->hasMany(SurveyOption::class, ['survey_question_id' => 'id'])->orderBy(['order_number' => SORT_ASC]);
+        return $this->hasMany(SurveyOption::class, ['survey_question_id' => 'id'])
+            ->orderBy([SurveyOption::tableName() . '.order_number' => SORT_ASC]);
     }
 
     public function getAnswers()

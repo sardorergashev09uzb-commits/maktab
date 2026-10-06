@@ -43,13 +43,36 @@ class TeacherController extends ActiveController
             ]);
         }
 
+        $status = \Yii::$app->request->get('status');
+        if ($status !== null && $status !== '') {
+            $query->andWhere(['{{%teacher}}.status' => (int)$status]);
+        }
+
         return new \yii\data\ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => (int)\Yii::$app->request->get('per-page', 50),
             ],
             'sort' => [
-                'defaultOrder' => ['id' => SORT_DESC],
+                'defaultOrder' => ['{{%teacher}}.id' => SORT_DESC],
+                'attributes' => [
+                    'id' => [
+                        'asc' => ['{{%teacher}}.id' => SORT_ASC],
+                        'desc' => ['{{%teacher}}.id' => SORT_DESC],
+                    ],
+                    'employee_code' => [
+                        'asc' => ['{{%teacher}}.employee_code' => SORT_ASC],
+                        'desc' => ['{{%teacher}}.employee_code' => SORT_DESC],
+                    ],
+                    'status' => [
+                        'asc' => ['{{%teacher}}.status' => SORT_ASC],
+                        'desc' => ['{{%teacher}}.status' => SORT_DESC],
+                    ],
+                    'experience_years' => [
+                        'asc' => ['{{%teacher}}.experience_years' => SORT_ASC],
+                        'desc' => ['{{%teacher}}.experience_years' => SORT_DESC],
+                    ],
+                ],
             ],
         ]);
     }

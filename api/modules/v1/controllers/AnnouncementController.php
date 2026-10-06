@@ -44,7 +44,7 @@ class AnnouncementController extends ActiveController
         }
 
         return new ActiveDataProvider([
-            'query' => $query->orderBy(['published_at' => SORT_DESC, 'id' => SORT_DESC]),
+            'query' => $query->orderBy(['{{%announcement}}.published_at' => SORT_DESC, '{{%announcement}}.id' => SORT_DESC]),
             'pagination' => ['pageSize' => 50],
         ]);
     }

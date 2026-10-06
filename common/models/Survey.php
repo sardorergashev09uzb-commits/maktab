@@ -50,12 +50,14 @@ class Survey extends ActiveRecord
 
     public function getDimensions()
     {
-        return $this->hasMany(SurveyDimension::class, ['survey_id' => 'id'])->orderBy(['order_number' => SORT_ASC]);
+        return $this->hasMany(SurveyDimension::class, ['survey_id' => 'id'])
+            ->orderBy([SurveyDimension::tableName() . '.order_number' => SORT_ASC]);
     }
 
     public function getQuestions()
     {
-        return $this->hasMany(SurveyQuestion::class, ['survey_id' => 'id'])->orderBy(['order_number' => SORT_ASC]);
+        return $this->hasMany(SurveyQuestion::class, ['survey_id' => 'id'])
+            ->orderBy([SurveyQuestion::tableName() . '.order_number' => SORT_ASC]);
     }
 
     public function getResponses()
